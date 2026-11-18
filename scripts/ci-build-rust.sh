@@ -21,7 +21,7 @@ cd "${ET_DIR}"
 rustup target add aarch64-apple-ios
 
 echo "==> cargo build -p easytier-ios --release --target aarch64-apple-ios"
-RUSTFLAGS="-C link-arg=-L${CLANG_RT_DIR}" \
+RUSTFLAGS="-C link-arg=-L${CLANG_RT_DIR} -C link-arg=-lclang_rt.ios" \
   cargo build -p easytier-ios --release --target aarch64-apple-ios
 
 mkdir -p "${REPO_ROOT}/Frameworks"
