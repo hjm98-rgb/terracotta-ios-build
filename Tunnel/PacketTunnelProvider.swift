@@ -110,9 +110,4 @@ final class PacketTunnelProvider: NEPacketTunnelProvider {
         logger.log("系统休眠，保持实例")
         completionHandler()
     }
-
-    override func wake(completionHandler: @escaping () -> Void) {
-        logger.log("系统唤醒")
-        completionHandler()
-    }
 }
