@@ -66,4 +66,3 @@ targets:
           - -leasytier_ios
           - -lc++
           - -lresolv
-        OTHER_LDFLAGS[arch=arm64]: -lclang_rt.ios
