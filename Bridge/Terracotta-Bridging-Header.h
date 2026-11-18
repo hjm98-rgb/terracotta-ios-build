@@ -1,0 +1,6 @@
+#ifndef TERRACOTTA_BRIDGING_HEADER_H
+#define TERRACOTTA_BRIDGING_HEADER_H
+
+#import "easytier-ios.h"
+
+#endif /* TERRACOTTA_BRIDGING_HEADER_H */

@@ -1,0 +1,69 @@
+name: Terracotta
+options:
+  bundleIdPrefix: com.doubao.terracotta
+  deploymentTarget:
+    iOS: "16.0"
+  createIntermediateGroups: true
+
+settings:
+  base:
+    SWIFT_VERSION: "5.9"
+    IPHONEOS_DEPLOYMENT_TARGET: "16.0"
+    ENABLE_BITCODE: NO
+    ONLY_ACTIVE_ARCH: NO
+    TARGETED_DEVICE_FAMILY: "1,2"
+
+schemes:
+  Terracotta:
+    build:
+      targets:
+        Terracotta: all
+    run:
+      config: Debug
+
+targets:
+  Terracotta:
+    type: application
+    platform: iOS
+    sources:
+      - App
+      - path: Shared
+        excludes:
+          - EasyTierIOS.swift
+    settings:
+      base:
+        INFOPLIST_FILE: App/Info.plist
+        PRODUCT_BUNDLE_IDENTIFIER: com.doubao.terracotta.ios
+        PRODUCT_NAME: Terracotta
+        CODE_SIGN_ENTITLEMENTS: App/Terracotta.entitlements
+        GENERATE_INFOPLIST_FILE: NO
+        CURRENT_PROJECT_VERSION: 1
+        MARKETING_VERSION: "1.0.0"
+    dependencies:
+      - target: TerracottaTunnel
+        embed: true
+        codeSign: true
+
+  TerracottaTunnel:
+    type: app-extension
+    platform: iOS
+    sources:
+      - Tunnel
+      - Shared
+    settings:
+      base:
+        INFOPLIST_FILE: Tunnel/Info.plist
+        PRODUCT_BUNDLE_IDENTIFIER: com.doubao.terracotta.ios.tunnel
+        PRODUCT_NAME: TerracottaTunnel
+        CODE_SIGN_ENTITLEMENTS: Tunnel/TerracottaTunnel.entitlements
+        GENERATE_INFOPLIST_FILE: NO
+        SWIFT_OBJC_BRIDGING_HEADER: Bridge/Terracotta-Bridging-Header.h
+        HEADER_SEARCH_PATHS:
+          - $(SRCROOT)/Bridge
+        LIBRARY_SEARCH_PATHS:
+          - $(SRCROOT)/Frameworks
+        OTHER_LDFLAGS:
+          - -leasytier_ios
+          - -lc++
+          - -lresolv
+        OTHER_LDFLAGS[arch=arm64]: -lclang_rt.ios
