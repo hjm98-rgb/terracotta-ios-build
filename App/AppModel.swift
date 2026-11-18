@@ -175,6 +175,15 @@ final class AppModel: ObservableObject {
     }
 
     func copy(_ text: String) {
-        UIPasteboard.general.string = text
+        let clean = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !clean.isEmpty else { return }
+        UIPasteboard.general.string = clean
+        UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+    }
+
+    /// MC Java 版连接地址：IP 在前，冒号，端口在后
+    var connectAddressText: String {
+        if let address = status.connectAddress, !address.isEmpty { return address }
+        return "127.0.0.1:\(mcPort)"
     }
 }

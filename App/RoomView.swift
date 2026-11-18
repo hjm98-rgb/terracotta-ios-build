@@ -1,22 +1,19 @@
 import SwiftUI
 
-/// 房间页：连接地址 / 进度 / 成员 / 断开
+/// 房间页：显示 IP:端口、进度、成员、断开
 struct RoomView: View {
     @EnvironmentObject private var model: AppModel
-
-    private var connectAddress: String? {
-        model.status.connectAddress
-    }
+    @State private var copied = false
 
     var body: some View {
         ZStack {
             Theme.background.ignoresSafeArea()
 
             ScrollView {
-                VStack(alignment: .leading, spacing: 18) {
+                VStack(alignment: .leading, spacing: 16) {
 
                     PixelCard {
-                        VStack(alignment: .leading, spacing: 14) {
+                        VStack(alignment: .leading, spacing: 12) {
                             HStack {
                                 StatusPill(connected: model.isConnected, text: model.phaseText)
                                 Spacer()
@@ -40,31 +37,53 @@ struct RoomView: View {
                     if model.currentRole == .guest {
                         PixelCard {
                             VStack(alignment: .leading, spacing: 10) {
-                                SectionLabel(text: "在游戏里这样进")
-                                Text(connectAddress ?? "等待分配地址…")
-                                    .font(Theme.mono(20, weight: .black))
-                                    .foregroundStyle(connectAddress == nil ? Theme.textDim : Theme.success)
+                                Text("游戏里填这个地址（IP:端口）")
+                                    .font(Theme.mono(12, weight: .bold))
+                                    .foregroundStyle(Theme.textDim)
+
+                                Text(model.connectAddressText)
+                                    .font(Theme.mono(24, weight: .black))
+                                    .foregroundStyle(Theme.success)
                                     .textSelection(.enabled)
-                                Text("多人游戏 → 直接连接 → 粘贴上面这串（英文冒号）")
+                                    .fixedSize(horizontal: false, vertical: true)
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+
+                                Text("多人游戏 → 直接连接 → 粘贴。冒号用英文半角。")
                                     .font(Theme.mono(12))
                                     .foregroundStyle(Theme.textDim)
                                     .fixedSize(horizontal: false, vertical: true)
-                                if let address = connectAddress {
-                                    Button("复制地址") { model.copy(address) }
-                                        .buttonStyle(GhostButtonStyle())
+
+                                Button(copied ? "已复制 ✓" : "复制 \(model.connectAddressText)") {
+                                    model.copy(model.connectAddressText)
+                                    copied = true
+                                    Task {
+                                        try? await Task.sleep(nanoseconds: 2_000_000_000)
+                                        copied = false
+                                    }
                                 }
+                                .buttonStyle(GhostButtonStyle())
                             }
                         }
                     } else {
                         PixelCard {
                             VStack(alignment: .leading, spacing: 10) {
-                                SectionLabel(text: "把房间码发给朋友")
+                                Text("把房间码发给朋友")
+                                    .font(Theme.mono(12, weight: .bold))
+                                    .foregroundStyle(Theme.textDim)
                                 Text(model.currentCode)
-                                    .font(Theme.mono(17, weight: .black))
+                                    .font(Theme.mono(18, weight: .black))
                                     .foregroundStyle(Theme.accent)
                                     .textSelection(.enabled)
-                                Button("复制房间码") { model.copy(model.currentCode) }
-                                    .buttonStyle(GhostButtonStyle())
+                                    .fixedSize(horizontal: false, vertical: true)
+                                Button(copied ? "已复制 ✓" : "复制房间码") {
+                                    model.copy(model.currentCode)
+                                    copied = true
+                                    Task {
+                                        try? await Task.sleep(nanoseconds: 2_000_000_000)
+                                        copied = false
+                                    }
+                                }
+                                .buttonStyle(GhostButtonStyle())
                             }
                         }
                     }
@@ -74,8 +93,10 @@ struct RoomView: View {
                     if !model.status.logs.isEmpty {
                         PixelCard {
                             VStack(alignment: .leading, spacing: 8) {
-                                SectionLabel(text: "最近事件")
-                                ForEach(Array(model.status.logs.suffix(6).enumerated()), id: \.offset) { _, line in
+                                Text("最近事件")
+                                    .font(Theme.mono(12, weight: .bold))
+                                    .foregroundStyle(Theme.textDim)
+                                ForEach(Array(model.status.logs.suffix(5).enumerated()), id: \.offset) { _, line in
                                     Text(line)
                                         .font(Theme.mono(11))
                                         .foregroundStyle(Theme.textDim)
@@ -107,7 +128,9 @@ struct RoomView: View {
     private var progressCard: some View {
         PixelCard {
             VStack(alignment: .leading, spacing: 12) {
-                SectionLabel(text: "连接进度")
+                Text("连接进度")
+                    .font(Theme.mono(12, weight: .bold))
+                    .foregroundStyle(Theme.textDim)
                 ForEach(steps, id: \.id) { step in
                     HStack(spacing: 10) {
                         Image(systemName: step.done ? "checkmark.square.fill" : "square")
@@ -117,9 +140,7 @@ struct RoomView: View {
                             .foregroundStyle(step.done ? Theme.textPrimary : Theme.textDim)
                         Spacer()
                         if step.active && !step.done {
-                            ProgressView()
-                                .controlSize(.mini)
-                                .tint(Theme.accent)
+                            ProgressView().controlSize(.mini).tint(Theme.accent)
                         }
                     }
                 }
