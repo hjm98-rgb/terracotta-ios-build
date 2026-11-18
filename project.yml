@@ -66,3 +66,7 @@ targets:
           - -leasytier_ios
           - -lc++
           - -lresolv
+          - -framework
+          - SystemConfiguration
+          - -framework
+          - Network
